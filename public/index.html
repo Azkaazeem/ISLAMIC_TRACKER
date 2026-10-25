@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>Namaz Tracker</title>
+  
+  <!-- Premium Modern Typography (Plus Jakarta Sans & Outfit) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="/css/style.css?v=6.0">
+  <link rel="icon" type="image/png" href="/assets/logo.png">
+</head>
+<body>
+
+  <!-- ==========================================
+       COMPACT NAVBAR
+  =========================================== -->
+  <header class="navbar">
+    <div class="nav-container">
+      
+      <!-- Left Side: Brand Logo (From public/assets/logo.png) -->
+      <a href="#" class="brand-logo-link" onclick="App.switchTab('namaz'); return false;" title="Namaz Tracker Home">
+        <img src="/assets/logo.png" alt="Namaz Tracker" class="brand-logo-img">
+      </a>
+
+      <!-- Center: Desktop Navigation Tabs -->
+      <nav id="nav-tabs" class="desktop-nav" style="display: none;">
+        <ul class="nav-links">
+          <li>
+            <button class="nav-btn active" data-tab="namaz" onclick="App.switchTab('namaz')">
+              <svg class="nav-svg" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+              <span data-i18n="navNamaz">Tracker</span>
+            </button>
+          </li>
+          <li>
+            <button class="nav-btn" data-tab="timings" onclick="App.switchTab('timings')">
+              <svg class="nav-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+              <span data-i18n="navTimings">Times</span>
+            </button>
+          </li>
+          <li>
+            <button class="nav-btn" data-tab="roza" onclick="App.switchTab('roza')">
+              <svg class="nav-svg" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+              <span data-i18n="navRoza">Roza</span>
+            </button>
+          </li>
+          <li>
+            <button class="nav-btn" data-tab="quran" onclick="App.switchTab('quran')">
+              <svg class="nav-svg" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+              <span data-i18n="navQuran">Quran</span>
+            </button>
+          </li>
+          <li>
+            <button class="nav-btn" data-tab="tahajjud" onclick="App.switchTab('tahajjud')">
+              <svg class="nav-svg" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+              <span data-i18n="navTahajjud">Tahajjud</span>
+            </button>
+          </li>
+          <li>
+            <button class="nav-btn" data-tab="mood" onclick="App.switchTab('mood')">
+              <svg class="nav-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M8 14s1.5 2 4 2 4-2 4-2"></path><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line></svg>
+              <span data-i18n="navMood">State</span>
+            </button>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- Right: Desktop Actions -->
+      <div class="nav-actions desktop-actions">
+        <!-- Light / Dark Mode Toggle Button -->
+        <button id="theme-toggle-btn" class="btn-icon-toggle" onclick="App.toggleTheme()" title="Switch Light / Dark Theme">
+          <svg id="theme-toggle-icon" class="ui-icon" viewBox="0 0 24 24">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+
+        <!-- Language Selector -->
+        <select id="lang-selector" class="lang-selector" title="Language">
+          <option value="en">English</option>
+          <option value="ur">اردو</option>
+          <option value="ar">العربية</option>
+          <option value="hi">हिन्दी</option>
+          <option value="tr">Türkçe</option>
+          <option value="fr">Français</option>
+          <option value="bn">বাংলা</option>
+          <option value="id">Bahasa</option>
+        </select>
+
+        <!-- User Profile Pill & Logout -->
+        <div id="nav-user-area" style="display: none; align-items: center; gap: 0.35rem;">
+          <div class="user-pill">
+            <div class="user-avatar" id="user-avatar-char">U</div>
+            <span id="user-name-display" style="font-weight: 600;">User</span>
+          </div>
+          <button class="btn-logout" onclick="App.logout()" data-i18n="navLogout">Logout</button>
+        </div>
+      </div>
+
+      <!-- Right Side: Mobile Hamburger Button (Only on small screens) -->
+      <button id="hamburger-btn" class="hamburger-btn" onclick="App.toggleMobileMenu()" aria-label="Open Menu">
+        <svg class="hamburger-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+
+    </div>
+  </header>
+
+  <!-- ==========================================
+       MOBILE NAVIGATION DRAWER & BACKDROP
+  =========================================== -->
+  <div id="drawer-backdrop" class="drawer-backdrop" onclick="App.closeMobileMenu()"></div>
+
+  <aside id="mobile-drawer" class="mobile-drawer">
+    <div class="drawer-header">
+      <div style="display:flex; align-items:center; gap:0.5rem;">
+        <img src="/assets/logo.png" alt="Logo" style="height:28px; width:28px; object-fit:contain; border-radius:5px;">
+        <span style="font-weight:700; color:var(--yellow-main); font-size:1.05rem;" data-i18n="appName">Namaz Tracker</span>
+      </div>
+      <button class="drawer-close-btn" onclick="App.closeMobileMenu()" aria-label="Close Menu">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+    </div>
+
+    <!-- Mobile Navigation Links (Shown when logged in) -->
+    <div id="mobile-nav-links-box" class="drawer-links" style="display:none;">
+      <button class="drawer-nav-item active" data-tab="namaz" onclick="App.mobileSwitchTab('namaz')">
+        <svg class="nav-svg" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+        <span data-i18n="navNamaz">Tracker</span>
+      </button>
+
+      <button class="drawer-nav-item" data-tab="timings" onclick="App.mobileSwitchTab('timings')">
+        <svg class="nav-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+        <span data-i18n="navTimings">Times</span>
+      </button>
+
+      <button class="drawer-nav-item" data-tab="roza" onclick="App.mobileSwitchTab('roza')">
+        <svg class="nav-svg" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        <span data-i18n="navRoza">Roza</span>
+      </button>
+
+      <button class="drawer-nav-item" data-tab="quran" onclick="App.mobileSwitchTab('quran')">
+        <svg class="nav-svg" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+        <span data-i18n="navQuran">Quran</span>
+      </button>
+
+      <button class="drawer-nav-item" data-tab="tahajjud" onclick="App.mobileSwitchTab('tahajjud')">
+        <svg class="nav-svg" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+        <span data-i18n="navTahajjud">Tahajjud</span>
+      </button>
+
+      <button class="drawer-nav-item" data-tab="mood" onclick="App.mobileSwitchTab('mood')">
+        <svg class="nav-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M8 14s1.5 2 4 2 4-2 4-2"></path><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line></svg>
+        <span data-i18n="navMood">State</span>
+      </button>
+    </div>
+
+    <!-- Mobile Drawer Footer Tools -->
+    <div class="drawer-footer">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.75rem;">
+        <span style="font-size:0.8rem; color:var(--text-muted);">Theme</span>
+        <button class="btn-ctrl" onclick="App.toggleTheme()" style="padding:0.35rem 0.65rem;">
+          <svg class="mini-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+          <span id="theme-mobile-label">Toggle Theme</span>
+        </button>
+      </div>
+
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.75rem;">
+        <span style="font-size:0.8rem; color:var(--text-muted);">Language</span>
+        <select id="lang-selector-mobile" class="lang-selector" onchange="App.handleMobileLangChange(this.value)">
+          <option value="en">English</option>
+          <option value="ur">اردو</option>
+          <option value="ar">العربية</option>
+          <option value="hi">हिन्दी</option>
+          <option value="tr">Türkçe</option>
+          <option value="fr">Français</option>
+          <option value="bn">বাংলা</option>
+          <option value="id">Bahasa</option>
+        </select>
+      </div>
+
+      <!-- Mobile User Area -->
+      <div id="mobile-user-box" style="display:none; padding-top:0.75rem; border-top:1px solid var(--border-subtle); align-items:center; justify-content:space-between;">
+        <div class="user-pill">
+          <div class="user-avatar" id="mobile-avatar-char">U</div>
+          <span id="mobile-user-name" style="font-weight:600;">User</span>
+        </div>
+        <button class="btn-logout" onclick="App.logout()" data-i18n="navLogout">Logout</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ==========================================
+       MAIN CONTENT CONTAINER
+  =========================================== -->
+  <main class="main-wrapper">
+
+    <!-- ==========================================
+         AUTHENTICATION SECTION (LOGIN & SIGNUP)
+    =========================================== -->
+    <section id="auth-section">
+
+      <!-- Login Card -->
+      <div id="login-box" class="auth-container">
+        <div class="auth-header">
+          <img src="/assets/logo.png" alt="Logo" class="auth-logo-img">
+          <h2 data-i18n="welcomeBack">Welcome Back</h2>
+          <p data-i18n="welcomeSubtitle">Sign in to access your prayer & spiritual log</p>
+        </div>
+
+        <div id="login-alert" class="alert-box alert-error"></div>
+
+        <form onsubmit="App.handleLogin(event)">
+          <div class="form-group">
+            <label data-i18n="emailAddress">Email Address</label>
+            <input type="email" id="login-email" class="form-control" required data-i18n-placeholder="emailPlaceholder" placeholder="you@example.com">
+          </div>
+
+          <div class="form-group">
+            <label data-i18n="password">Password</label>
+            <input type="password" id="login-password" class="form-control" required data-i18n-placeholder="passwordPlaceholder" placeholder="Enter your password">
+          </div>
+
+          <button type="submit" class="btn-primary" data-i18n="logInNow">Log In Now</button>
+        </form>
+
+        <div class="auth-switch">
+          <span data-i18n="dontHaveAccount">Don't have an account?</span>
+          <a href="#" onclick="App.showAuth('signup'); return false;" data-i18n="signUpNow">Sign Up Now</a>
+        </div>
+      </div>
+
+      <!-- Signup Card -->
+      <div id="signup-box" class="auth-container" style="display: none;">
+        <div class="auth-header">
+          <img src="/assets/logo.png" alt="Logo" class="auth-logo-img">
+          <h2 data-i18n="createAccountTitle">Create Free Account</h2>
+          <p data-i18n="createAccountSubtitle">Start tracking your daily prayers and habits</p>
+        </div>
+
+        <div id="signup-alert" class="alert-box alert-error"></div>
+
+        <form onsubmit="App.handleSignup(event)">
+          <div class="form-group">
+            <label data-i18n="fullName">Full Name</label>
+            <input type="text" id="signup-name" class="form-control" required data-i18n-placeholder="namePlaceholder" placeholder="e.g. Fatima / Ahmed">
+          </div>
+
+          <div class="form-group">
+            <label data-i18n="emailAddress">Email Address</label>
+            <input type="email" id="signup-email" class="form-control" required data-i18n-placeholder="emailPlaceholder" placeholder="you@example.com">
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label data-i18n="gender">Gender</label>
+              <select id="signup-gender" class="form-control" required>
+                <option value="" disabled selected data-i18n="genderSelect">Select Gender</option>
+                <option value="female" data-i18n="female">Female</option>
+                <option value="male" data-i18n="male">Male</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label data-i18n="age">Age</label>
+              <input type="number" id="signup-age" class="form-control" required min="3" max="120" data-i18n-placeholder="agePlaceholder" placeholder="e.g. 24">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label data-i18n="password">Password</label>
+            <input type="password" id="signup-password" class="form-control" required minlength="6" data-i18n-placeholder="passwordPlaceholder" placeholder="Minimum 6 characters">
+          </div>
+
+          <div class="form-group">
+            <label data-i18n="confirmPassword">Confirm Password</label>
+            <input type="password" id="signup-confirm-password" class="form-control" required minlength="6" data-i18n-placeholder="confirmPasswordPlaceholder" placeholder="Re-enter password">
+          </div>
+
+          <button type="submit" class="btn-primary" data-i18n="signUpNow">Sign Up Now</button>
+        </form>
+
+        <div class="auth-switch">
+          <span data-i18n="alreadyHaveAccount">Already have an account?</span>
+          <a href="#" onclick="App.showAuth('login'); return false;" data-i18n="logInNow">Log In Now</a>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ==========================================
+         AUTHENTICATED DASHBOARD APP SECTION
+    =========================================== -->
+    <section id="app-section" style="display: none;">
+
+      <!-- Compact Live Prayer Countdown Banner (Dynamic Island Style) -->
+      <div class="timing-banner">
+        
+        <!-- Live Prayer Status Badges -->
+        <div class="timing-live-status">
+          <!-- 1. Current Namaz -->
+          <div class="timing-status-pill pill-current-namaz">
+            <span class="live-pulse-dot"></span>
+            <span class="timing-badge-label" data-i18n="currentNamaz">Current:</span>
+            <strong id="current-prayer-name" class="timing-highlight-gold">--</strong>
+          </div>
+
+          <!-- 2. Exact City Time Clock -->
+          <div class="timing-status-pill pill-clock" title="Exact Local Time">
+            <svg class="mini-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            <span class="timing-badge-label" data-i18n="currentTime">Time:</span>
+            <strong id="current-city-time" class="timing-clock-val">--:--:--</strong>
+          </div>
+
+          <!-- 3. Next Prayer Countdown -->
+          <div class="timing-status-pill pill-next-namaz">
+            <span class="timing-badge-label" data-i18n="nextPrayerIn">Next:</span>
+            <strong id="next-prayer-name">--</strong>
+            <span id="next-prayer-countdown" class="timing-countdown">--:--:--</span>
+          </div>
+        </div>
+
+        <!-- 2 Dynamic Dropdowns: Country & City -->
+        <div class="timing-location-pickers">
+          <div class="loc-dropdown-group">
+            <label for="country-select" class="loc-dropdown-label" data-i18n="country">Country</label>
+            <select id="country-select" class="loc-dropdown-select" onchange="TimingsManager.onCountryChange(this.value)">
+              <!-- Populated dynamically -->
+            </select>
+          </div>
+
+          <div class="loc-dropdown-group">
+            <label for="city-select" class="loc-dropdown-label" data-i18n="city">City</label>
+            <select id="city-select" class="loc-dropdown-select" onchange="TimingsManager.onCityChange(this.value)">
+              <!-- Populated dynamically -->
+            </select>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ==========================================
+           TAB 1: MONTHLY TRACKER (HOME)
+      =========================================== -->
+      <div id="tab-namaz" class="tab-content">
+        
+        <!-- Monthly Statistics Overview Cards -->
+        <div class="overview-grid">
+          <div class="stat-card">
+            <div class="stat-icon prayed">
+              <svg class="ui-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </div>
+            <div class="stat-info">
+              <h4 data-i18n="statsPrayed">Prayed</h4>
+              <p id="stat-prayed-count">0</p>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon qaza">
+              <svg class="ui-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle></svg>
+            </div>
+            <div class="stat-info">
+              <h4 data-i18n="statsQaza">Qaza</h4>
+              <p id="stat-qaza-count">0</p>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon missed">
+              <svg class="ui-icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </div>
+            <div class="stat-info">
+              <h4 data-i18n="statsMissed">Missed</h4>
+              <p id="stat-missed-count">0</p>
+            </div>
+          </div>
+
+          <!-- Conditionally shown for female age >= 10 -->
+          <div class="stat-card" id="stat-card-uzr">
+            <div class="stat-icon uzr">
+              <svg class="ui-icon" viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>
+            </div>
+            <div class="stat-info">
+              <h4 data-i18n="statsUzr">Uzr Days</h4>
+              <p id="stat-uzr-count">0</p>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon score">
+              <svg class="ui-icon" viewBox="0 0 24 24"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>
+            </div>
+            <div class="stat-info">
+              <h4 data-i18n="statsCompletion">Completion</h4>
+              <p id="stat-score-percent">0%</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Month Navigation Bar & Legend -->
+        <div class="controls-bar">
+          
+          <!-- Month Switcher -->
+          <div class="month-nav">
+            <button class="btn-ctrl" onclick="App.changeMonth(-1)" data-i18n="prevMonth">
+              <svg class="mini-svg" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
+              <span>Prev</span>
+            </button>
+            <div id="current-month-display" class="current-month-label">October 2026</div>
+            <button class="btn-ctrl" onclick="App.changeMonth(1)" data-i18n="nextMonth">
+              <span>Next</span>
+              <svg class="mini-svg" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </button>
+            <button class="btn-ctrl" onclick="App.goToCurrentMonth()" data-i18n="today">Today</button>
+          </div>
+
+          <!-- Symbol Legend Bar (Pure Icons) -->
+          <div class="legend-pills">
+            <div class="legend-pill">
+              <span class="symbol-badge symbol-prayed">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              </span>
+              <span data-i18n="statusPrayed">Prayed</span>
+            </div>
+            <div class="legend-pill">
+              <span class="symbol-badge symbol-qaza">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="12" cy="12" r="9"></circle></svg>
+              </span>
+              <span data-i18n="statusQaza">Qaza</span>
+            </div>
+            <div class="legend-pill">
+              <span class="symbol-badge symbol-missed">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              </span>
+              <span data-i18n="statusMissed">Missed</span>
+            </div>
+            <div class="legend-pill" id="female-uzr-legend-item">
+              <span class="symbol-badge symbol-uzr">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>
+              </span>
+              <span data-i18n="statusUzr">Uzr</span>
+            </div>
+            <div class="legend-pill">
+              <span class="symbol-badge symbol-empty">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              </span>
+              <span data-i18n="statusUnmarked">Unmarked</span>
+            </div>
+          </div>
+
+        </div>
+
+        <div style="font-size: 0.75rem; color: var(--text-dim); margin-bottom: 0.45rem;" data-i18n="quickTip">
+          Tip: Click any cell to cycle status, or use the quick buttons for the day.
+        </div>
+
+        <!-- 30/31 Day Monthly Table (Sticky Day Column for Responsive Scrolling) -->
+        <div class="table-container">
+          <table class="tracker-table">
+            <thead>
+              <tr>
+                <th class="col-day" data-i18n="day">Day</th>
+                <th data-i18n="fajr">Fajr</th>
+                <th data-i18n="dhuhr">Dhuhr</th>
+                <th data-i18n="asr">Asr</th>
+                <th data-i18n="maghrib">Maghrib</th>
+                <th data-i18n="isha">Isha</th>
+                <th style="min-width: 110px;" data-i18n="action">Action</th>
+              </tr>
+            </thead>
+            <tbody id="prayer-table-body">
+              <!-- Dynamically populated rows 1-31 by app.js -->
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+
+      <!-- ==========================================
+           TAB 2: PRAYER TIMINGS
+      =========================================== -->
+      <div id="tab-timings" class="tab-content" style="display: none;">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title">
+                <svg class="ui-icon" style="color:var(--yellow-main);" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                <span data-i18n="navTimings">Prayer Times</span>
+              </h3>
+              <p class="card-subtitle">
+                <span class="dynamic-location-name">Karachi, Pakistan</span> &bull; 
+                <span id="current-hijri-display">12 Jumada al-Ula 1448 AH</span>
+              </p>
+            </div>
+            
+            <!-- Synchronized Country & City Selectors inside Timings tab -->
+            <div class="timing-location-pickers">
+              <div class="loc-dropdown-group">
+                <label for="times-country-select" class="loc-dropdown-label" data-i18n="country">Country</label>
+                <select id="times-country-select" class="loc-dropdown-select" onchange="TimingsManager.onCountryChange(this.value)">
+                  <!-- Populated dynamically -->
+                </select>
+              </div>
+
+              <div class="loc-dropdown-group">
+                <label for="times-city-select" class="loc-dropdown-label" data-i18n="city">City</label>
+                <select id="times-city-select" class="loc-dropdown-select" onchange="TimingsManager.onCityChange(this.value)">
+                  <!-- Populated dynamically -->
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Highlight Status Banner inside Tab -->
+          <div class="tab-times-status-banner">
+            <div class="tab-times-status-item">
+              <span class="status-item-label" data-i18n="currentNamaz">Current Namaz</span>
+              <strong id="times-current-prayer-name" class="status-item-value highlight-gold">--</strong>
+            </div>
+            <div class="tab-times-status-item">
+              <span class="status-item-label" data-i18n="currentTime">City Time</span>
+              <strong id="times-city-time" class="status-item-value">--:--:--</strong>
+            </div>
+            <div class="tab-times-status-item">
+              <span class="status-item-label" data-i18n="nextPrayerIn">Next prayer in</span>
+              <strong class="status-item-value"><span id="times-next-prayer-name">--</span> (<span id="times-next-prayer-countdown">--:--:--</span>)</strong>
+            </div>
+          </div>
+
+          <div class="timings-grid">
+            <div class="prayer-time-card" id="card-fajr">
+              <div class="active-badge" data-i18n="activeNow">ACTIVE NOW</div>
+              <div class="prayer-time-name" data-i18n="fajr">Fajr</div>
+              <div class="prayer-time-val" id="time-fajr">--:--</div>
+            </div>
+            <div class="prayer-time-card" id="card-sunrise">
+              <div class="active-badge" data-i18n="activeNow">ACTIVE NOW</div>
+              <div class="prayer-time-name" data-i18n="sunrise">Sunrise</div>
+              <div class="prayer-time-val" id="time-sunrise">--:--</div>
+            </div>
+            <div class="prayer-time-card" id="card-dhuhr">
+              <div class="active-badge" data-i18n="activeNow">ACTIVE NOW</div>
+              <div class="prayer-time-name" data-i18n="dhuhr">Dhuhr</div>
+              <div class="prayer-time-val" id="time-dhuhr">--:--</div>
+            </div>
+            <div class="prayer-time-card" id="card-asr">
+              <div class="active-badge" data-i18n="activeNow">ACTIVE NOW</div>
+              <div class="prayer-time-name" data-i18n="asr">Asr</div>
+              <div class="prayer-time-val" id="time-asr">--:--</div>
+            </div>
+            <div class="prayer-time-card" id="card-maghrib">
+              <div class="active-badge" data-i18n="activeNow">ACTIVE NOW</div>
+              <div class="prayer-time-name" data-i18n="maghrib">Maghrib</div>
+              <div class="prayer-time-val" id="time-maghrib">--:--</div>
+            </div>
+            <div class="prayer-time-card" id="card-isha">
+              <div class="active-badge" data-i18n="activeNow">ACTIVE NOW</div>
+              <div class="prayer-time-name" data-i18n="isha">Isha</div>
+              <div class="prayer-time-val" id="time-isha">--:--</div>
+            </div>
+          </div>
+
+          <div class="timings-grid" style="margin-top: 0.65rem;">
+            <div class="prayer-time-card" style="border-color: var(--yellow-amber);">
+              <div class="prayer-time-name">Suhoor Ends</div>
+              <div class="prayer-time-val" id="time-suhoor">--:--</div>
+            </div>
+            <div class="prayer-time-card" style="border-color: var(--yellow-amber);">
+              <div class="prayer-time-name">Iftar Time</div>
+              <div class="prayer-time-val" id="time-iftar">--:--</div>
+            </div>
+            <div class="prayer-time-card" style="border-color: var(--yellow-main);">
+              <div class="prayer-time-name" data-i18n="lastThird">Tahajjud (Last 3rd)</div>
+              <div class="prayer-time-val" id="time-tahajjud">--:--</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==========================================
+           TAB 3: ROZA TRACKER
+      =========================================== -->
+      <div id="tab-roza" class="tab-content" style="display: none;">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title">
+                <svg class="ui-icon" style="color:var(--yellow-main);" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                <span data-i18n="rozaTitle">Monthly Roza Tracker</span>
+              </h3>
+              <p class="card-subtitle" data-i18n="rozaSubtitle">Track your obligatory Ramadan fasts and Sunnah/Nafl fasts</p>
+            </div>
+            <div style="display: flex; gap: 1rem;">
+              <div style="text-align: right;">
+                <span style="font-size: 0.75rem; color: var(--text-muted);" data-i18n="totalFasts">Total Fasts:</span>
+                <strong id="stat-roza-kept" style="font-size: 1.05rem; color: var(--status-prayed); display: block;">0</strong>
+              </div>
+              <div style="text-align: right;">
+                <span style="font-size: 0.75rem; color: var(--text-muted);" data-i18n="qazaRemaining">Qaza Pending:</span>
+                <strong id="stat-roza-qaza" style="font-size: 1.05rem; color: var(--status-missed); display: block;">0</strong>
+              </div>
+            </div>
+          </div>
+
+          <div style="font-size: 0.75rem; color: var(--text-dim); margin-bottom: 0.45rem;">
+            Click any day to cycle: Fasted ➔ Nafl ➔ Missed ➔ Uzr ➔ Clear
+          </div>
+
+          <div id="roza-month-grid" class="roza-grid">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+      </div>
+
+      <!-- ==========================================
+           TAB 4: QURAN RECITATION TRACKER
+      =========================================== -->
+      <div id="tab-quran" class="tab-content" style="display: none;">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title">
+                <svg class="ui-icon" style="color:var(--yellow-main);" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+                <span data-i18n="quranTitle">Daily Quran Recitation Progress</span>
+              </h3>
+              <p class="card-subtitle" data-i18n="quranSubtitle">Log your daily Tilawat towards your Khatam</p>
+            </div>
+            <div>
+              <span style="font-size: 0.75rem; color: var(--text-muted);" data-i18n="totalPagesRead">Total Pages:</span>
+              <strong id="stat-quran-pages" style="font-size: 1.15rem; color: var(--yellow-main); margin-left: 0.35rem;">0</strong>
+            </div>
+          </div>
+
+          <!-- Add Entry Form -->
+          <form onsubmit="App.addQuranEntry(event)" style="background: var(--bg-surface-elevated); padding: 0.85rem; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); margin-bottom: 1rem;">
+            <div class="quran-form-grid">
+              <div>
+                <label style="font-size: 0.75rem; color: var(--text-muted);" data-i18n="day">Day</label>
+                <input type="number" id="quran-day-input" class="form-control" min="1" max="31" value="23" required>
+              </div>
+              <div>
+                <label style="font-size: 0.75rem; color: var(--text-muted);" data-i18n="juz">Juz</label>
+                <input type="number" id="quran-juz-input" class="form-control" min="1" max="30" placeholder="1-30">
+              </div>
+              <div>
+                <label style="font-size: 0.75rem; color: var(--text-muted);" data-i18n="surah">Surah</label>
+                <input type="text" id="quran-surah-input" class="form-control" placeholder="e.g. Al-Baqarah">
+              </div>
+              <div>
+                <label style="font-size: 0.75rem; color: var(--text-muted);" data-i18n="ayahRange">Ayah</label>
+                <input type="text" id="quran-ayah-input" class="form-control" placeholder="e.g. 1-25">
+              </div>
+              <div>
+                <label style="font-size: 0.75rem; color: var(--text-muted);" data-i18n="pagesCount">Pages</label>
+                <input type="number" id="quran-pages-input" class="form-control" min="1" placeholder="e.g. 4" required>
+              </div>
+            </div>
+            <div style="margin-top: 0.5rem;">
+              <input type="text" id="quran-notes-input" class="form-control" placeholder="Reflection or note (optional)...">
+            </div>
+            <button type="submit" class="btn-primary" style="margin-top: 0.65rem; width: auto; padding: 0.45rem 1.25rem;" data-i18n="addQuranEntry">Log Recitation</button>
+          </form>
+
+          <!-- Reading Logs List -->
+          <div id="quran-logs-list" class="quran-log-list">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+      </div>
+
+      <!-- ==========================================
+           TAB 5: TAHAJJUD LOG & REMINDER
+      =========================================== -->
+      <div id="tab-tahajjud" class="tab-content" style="display: none;">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title">
+                <svg class="ui-icon" style="color:var(--yellow-main);" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                <span data-i18n="tahajjudTitle">Tahajjud Reminder & Log</span>
+              </h3>
+              <p class="card-subtitle" data-i18n="tahajjudSubtitle">Awaken in the peaceful silence of the night for intimate Dua</p>
+            </div>
+          </div>
+
+          <div style="background: rgba(245, 158, 11, 0.08); border: 1px solid var(--border-gold); padding: 0.85rem; border-radius: var(--radius-md); margin-bottom: 1rem; text-align: center;">
+            <p style="font-size: 0.95rem; color: var(--yellow-main); font-style: italic;" data-i18n="tahajjudBenefit">
+              “The best prayer after the obligatory prayers is the night prayer.” (Sahih Muslim)
+            </p>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem;">
+            
+            <!-- Daily Tahajjud Check-in -->
+            <div style="background: var(--bg-surface-elevated); padding: 1rem; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); text-align: center;">
+              <h4 style="font-size: 0.95rem; color: var(--text-main); margin-bottom: 0.45rem;">Tonight's Prayer</h4>
+              <p style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 0.85rem;">Did you wake up for Tahajjud?</p>
+              <button id="tahajjud-today-btn" class="btn-primary" onclick="App.toggleTodayTahajjud()">
+                Mark Tahajjud Offered
+              </button>
+            </div>
+
+            <!-- Reminder Setting -->
+            <div style="background: var(--bg-surface-elevated); padding: 1rem; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+              <h4 style="font-size: 0.95rem; color: var(--text-main); margin-bottom: 0.45rem;" data-i18n="tahajjudReminderTime">Tahajjud Target Time</h4>
+              <p style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 0.65rem;">Set your daily target time to wake up:</p>
+              <div style="display: flex; gap: 0.5rem;">
+                <input type="time" id="tahajjud-time-input" class="form-control" value="04:30">
+                <button class="btn-primary" style="width: auto; white-space: nowrap;" onclick="App.saveTahajjudTime()" data-i18n="saveReminder">Save Time</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ==========================================
+           TAB 6: SPIRITUAL STATE (MOOD)
+      =========================================== -->
+      <div id="tab-mood" class="tab-content" style="display: none;">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title">
+                <svg class="ui-icon" style="color:var(--yellow-main);" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M8 14s1.5 2 4 2 4-2 4-2"></path><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line></svg>
+                <span data-i18n="moodTitle">Spiritual State & Reflections</span>
+              </h3>
+              <p class="card-subtitle" data-i18n="moodSubtitle">Select your current spiritual state to receive guidance:</p>
+            </div>
+          </div>
+
+          <!-- Mood Pickers Grid (Compact Vector SVGs) -->
+          <div class="mood-picker-grid">
+            <div class="mood-card" data-mood="peaceful" onclick="App.selectMood('peaceful')">
+              <div class="mood-icon-wrapper">
+                <svg class="mood-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+              </div>
+              <div class="mood-title" data-i18n="moodPeaceful">Peaceful</div>
+            </div>
+
+            <div class="mood-card" data-mood="grateful" onclick="App.selectMood('grateful')">
+              <div class="mood-icon-wrapper">
+                <svg class="mood-svg" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+              </div>
+              <div class="mood-title" data-i18n="moodGrateful">Grateful</div>
+            </div>
+
+            <div class="mood-card" data-mood="anxious" onclick="App.selectMood('anxious')">
+              <div class="mood-icon-wrapper">
+                <svg class="mood-svg" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+              </div>
+              <div class="mood-title" data-i18n="moodAnxious">Anxious</div>
+            </div>
+
+            <div class="mood-card" data-mood="repentant" onclick="App.selectMood('repentant')">
+              <div class="mood-icon-wrapper">
+                <svg class="mood-svg" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
+              </div>
+              <div class="mood-title" data-i18n="moodRepentant">Repentant</div>
+            </div>
+
+            <div class="mood-card" data-mood="low_iman" onclick="App.selectMood('low_iman')">
+              <div class="mood-icon-wrapper">
+                <svg class="mood-svg" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+              </div>
+              <div class="mood-title" data-i18n="moodLowIman">Weak / Tired</div>
+            </div>
+
+            <div class="mood-card" data-mood="hopeful" onclick="App.selectMood('hopeful')">
+              <div class="mood-icon-wrapper">
+                <svg class="mood-svg" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+              </div>
+              <div class="mood-title" data-i18n="moodHopeful">Hopeful</div>
+            </div>
+          </div>
+
+          <!-- Curated Quranic Ayah Display -->
+          <div class="ayah-quote-box">
+            <div class="ayah-arabic" id="ayah-arabic-text">
+              الَّذِينَ آمَنُوا وَتَطْمَئِنُّ قُلُوبُهُم بِذِكْرِ اللَّهِ ۗ أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ
+            </div>
+            <div class="ayah-translation" id="ayah-trans-text">
+              “Those who have believed and whose hearts are assured by the remembrance of Allah. Unquestionably, by the remembrance of Allah hearts are assured.”
+            </div>
+            <div class="ayah-ref" id="ayah-ref-text">
+              Surah Ar-Ra’d (13:28)
+            </div>
+
+            <div style="margin-top: 0.85rem; padding-top: 0.75rem; border-top: 1px dashed var(--border-subtle);">
+              <span style="font-size: 0.75rem; color: var(--text-muted);">Recommended Zikr / Dua:</span>
+              <div id="recommended-dua-text" style="font-size: 1.05rem; font-weight: bold; color: var(--yellow-main); margin-top: 0.25rem;">
+                سُبْحَانَ اللَّهِ وَبِحَمْدِهِ ، سُبْحَانَ اللَّهِ الْعَظِيمِ
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ==========================================
+       FOOTER
+  =========================================== -->
+  <footer class="footer">
+    <div>
+      <span class="footer-gold">Namaz Tracker</span> • Mindful Habit Tracking
+    </div>
+  </footer>
+
+  <!-- Scripts: SweetAlert2, GSAP Animation Platform, i18n, timings, app -->
+  <script src="/js/sweetalert2.all.min.js"></script>
+  <script src="/js/gsap.min.js"></script>
+  <script src="/js/i18n.js?v=6.0"></script>
+  <script src="/js/timings.js?v=6.0"></script>
+  <script src="/js/app.js?v=6.0"></script>
+</body>
+</html>
