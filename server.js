@@ -30,15 +30,59 @@ app.use(
   })
 );
 
-// Connect to MongoDB
-const mongoUri = process.env.MONGODB_URI || 'mongodb+srv://azkaazeem804_db_user:mlEHKIIXFr5xIYaW@cluster0.y6qrf3a.mongodb.net/namaz_tracker?retryWrites=true&w=majority';
+// Connect to MongoDB with Serverless Caching (Vercel & Local)
+const mongoUri =
+  process.env.MONGODB_URI ||
+  'mongodb+srv://azkaazeem804_db_user:mlEHKIIXFr5xIYaW@cluster0.y6qrf3a.mongodb.net/namaz_tracker?retryWrites=true&w=majority';
 
-mongoose
-  .connect(mongoUri)
-  .then(() => console.log('✓ Successfully connected to MongoDB Atlas'))
-  .catch((err) => {
-    console.error('✗ MongoDB connection error:', err.message);
-  });
+let cachedDbPromise = null;
+
+async function connectDB() {
+  if (mongoose.connection.readyState === 1) {
+    return mongoose.connection;
+  }
+
+  if (!cachedDbPromise) {
+    const opts = {
+      bufferCommands: false, // Disable command buffering to prevent 10000ms timeouts
+      serverSelectionTimeoutMS: 8000,
+      connectTimeoutMS: 10000,
+    };
+    cachedDbPromise = mongoose.connect(mongoUri, opts).then((m) => {
+      console.log('✓ Successfully connected to MongoDB Atlas');
+      return m.connection;
+    });
+  }
+
+  try {
+    return await cachedDbPromise;
+  } catch (err) {
+    cachedDbPromise = null;
+    throw err;
+  }
+}
+
+// Warm up initial connection
+connectDB().catch((err) => {
+  console.warn('✗ Initial MongoDB connection attempt:', err.message);
+});
+
+// Middleware: Ensure database is connected before processing any /api request
+app.use(async (req, res, next) => {
+  if (req.path.startsWith('/api')) {
+    try {
+      await connectDB();
+    } catch (err) {
+      console.error('✗ Database connection failed for', req.method, req.path, ':', err.message);
+      return res.status(500).json({
+        error:
+          'Database connection failed. Please ensure MongoDB Atlas Network Access has "0.0.0.0/0" (Allow Access from Anywhere) enabled.',
+        details: err.message,
+      });
+    }
+  }
+  next();
+});
 
 // Helper: Check if female is eligible for period gap (female & age >= 10)
 const isPeriodEligible = (user) => {
@@ -581,10 +625,15 @@ app.use((req, res, next) => {
   next();
 });
 
-// Start Server
-app.listen(PORT, () => {
-  console.log(`===============================================`);
-  console.log(`🕌 Namaz Tracker Server is running on port ${PORT}`);
-  console.log(`🔗 URL: http://localhost:${PORT}`);
-  console.log(`===============================================`);
-});
+// Start Server if running directly (Local development)
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`===============================================`);
+    console.log(`🕌 Namaz Tracker Server is running on port ${PORT}`);
+    console.log(`🔗 URL: http://localhost:${PORT}`);
+    console.log(`===============================================`);
+  });
+}
+
+// Export Express app for Vercel Serverless Functions
+module.exports = app;
